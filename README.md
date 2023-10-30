@@ -1,4 +1,4 @@
-# How many stars given to a user ⭐
+# How many stars are given to a user? ⭐
 
 Simple site to query how many stars a user has across all their public repos.
 
