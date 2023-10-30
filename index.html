@@ -1,0 +1,51 @@
+<h1>How many stars have been given to a user?</h1>
+
+<input />
+
+<button>Go</button>
+
+<div id="result"></div>
+
+<script>
+    const button = document.querySelector('button');
+    const input = document.querySelector('input');
+    const resultDiv = document.getElementById("result");
+
+    window.addEventListener('load', function (event) {
+        input.addEventListener('keydown', async (event) => {
+            if (["Enter", "NumpadEnter"].includes(event.code)) {
+                getStars(input.value);
+            }
+        });
+
+        button.addEventListener('click', async () => {
+            getStars(input.value);
+        });
+    });
+
+    async function getStars(user) {
+        resultDiv.innerHTML = "";
+
+        fetchAllRepos(user)
+            .then(repos => {
+                const totalStarGazers = repos.reduce((sum, current) => sum + current.stargazers_count, 0);
+                resultDiv.innerHTML = `${totalStarGazers} stars ⭐`;
+            });
+    }
+
+    async function fetchAllRepos(user) {
+        let url = `https://api.github.com/users/${user}/repos?per_page=100`;
+        let repos = [];
+        while (url) {
+            const response = await fetch(url, {
+                headers: { 'Accept': 'application/vnd.github.v3+json' }
+            });
+            const data = await response.json();
+            repos = repos.concat(data);
+            const linkHeader = response.headers.get('Link');
+            const nextLink = linkHeader && linkHeader.match(/<([^>]+)>;\s*rel="next"/);
+            url = nextLink && nextLink[1];
+        }
+        return repos;
+    }
+</script>
